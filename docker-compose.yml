@@ -6,14 +6,14 @@ services:
             dockerfile: ./dockerfiles/Dockerfile-PHP-fpm
         # name doesn't matter unless pushed to Docker Hub or ECR, etc.
         image: lux-adrian/laravel-app
-        container_name: name
+        container_name: app
         restart: unless-stopped
-        # enviornment:
-        #     DB_HOST: mysql
-        #     DB_PASSWORD: password
+        environment:
+            DB_HOST: mysql
+            DB_PASSWORD: password
         #Mount project files in the container to be directly reflected when edited.
         volumes: 
-            - ./laravel-app:/var/www
+            - ./laravel-app:/var/www/laravel-app
     #will act as reverse proxy for php-fpm server to serve the files rendered by php        
     nginx:
         build:
@@ -30,17 +30,17 @@ services:
             - ./config/nginx/conf.d:/etc/nginx/conf.d   
         depends_on: 
             - "app"
-#     mysql:
-#         image: mysql:8.0.26
-#         containter_name: mysql
-#         environment:
-#             MYSQL_DATABASE: laravel
-#             MYSQL_ROOT_PASSWORD: password
-#         volumes:
-#             - db_data:/var/lib/mysql
+    mysql:
+        image: mysql:8.0.26
+        container_name: db
+        environment:
+            MYSQL_DATABASE: laravel
+            MYSQL_ROOT_PASSWORD: password
+        volumes:
+            - db_data:/var/lib/mysql
 
-# volumes:
-#     db_data:
-#         driver: local
+volumes:
+    db_data:
+        driver: local
 
 
