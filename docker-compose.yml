@@ -11,9 +11,14 @@ services:
         environment:
             DB_HOST: mysql
             DB_PASSWORD: password
+            SESSION_DRIVER: redis
+            REDIS_HOST: redis
         #Mount project files in the container to be directly reflected when edited.
         volumes: 
             - ./laravel-app:/var/www/laravel-app
+        depends_on: 
+            - "mysql"
+            - "redis"    
     #will act as reverse proxy for php-fpm server to serve the files rendered by php        
     nginx:
         build:
@@ -26,7 +31,7 @@ services:
             # map port 8080 from localhost to port 80 for nginx container that is loccated in virtual network created by docker
             - 80:80
         volumes:
-            - ./laravel-app:/var/www
+            - ./laravel-app:/var/www/laravel-app
             - ./config/nginx/conf.d:/etc/nginx/conf.d   
         depends_on: 
             - "app"
@@ -38,6 +43,9 @@ services:
             MYSQL_ROOT_PASSWORD: password
         volumes:
             - db_data:/var/lib/mysql
+    redis:
+        image: redis:latest
+        container_name: redis
 
 volumes:
     db_data:
